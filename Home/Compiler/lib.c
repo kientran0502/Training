@@ -1,0 +1,6 @@
+#include "lib.h"
+
+void func1(void)
+{
+    printf("Function 1");
+}

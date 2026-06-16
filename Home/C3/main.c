@@ -12,7 +12,7 @@ int main(void)
 
 
 //gcc -E main.c -o main.i # Preprocessing
-//gcc -S main.c -o main.s  # Compiling
+//gcc -S main.i -o main.s  # Compiling
 //gcc -c main.s -o main.o (nm main.o  objdump -d main.o)
 //gcc -c lib.c -o lib.o  
 //gcc main.o lib.o -o main.exe
