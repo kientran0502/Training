@@ -2,5 +2,5 @@
 
 void func1(void)
 {
-    printf("Function 1");
+    printf("Function 1\n");
 }
