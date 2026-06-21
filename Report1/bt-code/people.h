@@ -2,8 +2,10 @@
 #define PEOPLE_H
 
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
-#define MAX_PEOPLE           100
+#define MAX_PEOPLE           10
 
 typedef union
 {
@@ -11,17 +13,17 @@ typedef union
     uint16_t salary;
 } get_t;
 
+typedef struct someone someone_t;
 
-typedef struct
+typedef struct someone
 {
     char type[10];
     get_t income;
-    void (*action)(someone_t *people); 
+    void (*action)(someone_t *people, FILE *file); 
 } someone_t;
 
-void people_init(someone_t *people);
-void cadge(someone_t *people);
-void stole(someone_t *people);
-void work(someone_t *people);
+void cadge(someone_t *people, FILE *file);
+void stole(someone_t *people, FILE *file);
+void work(someone_t *people, FILE *file);
 
-#endif 
+#endif

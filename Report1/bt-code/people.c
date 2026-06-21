@@ -1,51 +1,22 @@
 #include "people.h"
 
-void people_init(someone_t *people)
-{
-    if(people == NULL || people->type == NULL)
-    {
-        printf("People is NULL");
-        return;
-    }
 
-    switch(people->type)
-    {
-        case "anxin":
-            people->income = "tuytam";
-            people->action = cadge;
-            break;
-        
-        case "antrom":
-            people->income = "henxui";
-            people->action = stole;
-            break;
-
-        case "congnhan":
-            people->income = 500000;
-            people->action = work;
-            break;    
-        
-        default:
-            printf("people is not defined");
-            break;
-
-    }
-}
-
-void cadge(someone_t *people)
+void cadge(someone_t *people, FILE *file)
 {
     printf("anxin: lam on lam phuoc\n");
-    // dua vao text
+    fwrite("anxin: lam on lam phuoc\n", 1, 24, file);
 }
 
-void stole(someone_t *people)
+void stole(someone_t *people, FILE *file)
 {
     printf("antrom: cuop!!!\n");
-    // dua vao text
+    fwrite("antrom: cuop!!!\n", 1, 16, file);
 }
 
-void work(someone_t *people)
+void work(someone_t *people, FILE *file)
 {
-    printf("congnhan: income is %d\n", people->salary);
-    // dua vao text
+    char buffer[64];
+    snprintf(buffer, sizeof(buffer), "congnhan: income is %d\n", people->income.salary);
+    printf("%s", buffer);
+    fwrite(buffer, 1, strlen(buffer), file);
 }
