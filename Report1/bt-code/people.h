@@ -27,3 +27,5 @@ void stole(someone_t *people, FILE *file);
 void work(someone_t *people, FILE *file);
 
 #endif
+
+

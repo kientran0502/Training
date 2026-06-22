@@ -67,3 +67,4 @@ bool people_create(someone_t *people, uint8_t type)
     
     return true;
 }
+

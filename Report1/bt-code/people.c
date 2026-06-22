@@ -20,3 +20,4 @@ void work(someone_t *people, FILE *file)
     printf("%s", buffer);
     fwrite(buffer, 1, strlen(buffer), file);
 }
+
