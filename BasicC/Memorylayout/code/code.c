@@ -15,43 +15,21 @@ int main()
 
 
 
-
-#include <sys/wait.h>
 #include "tlpi_hdr.h"
+
+extern char **environ;
 
 int
 main(int argc, char *argv[])
 {
-    int numChildren, j;
-    pid_t childPid;
+    int j;
+    char **ep;
 
-    if (argc > 1 && strcmp(argv[1], "--help") == 0)
-        usageErr("%s [num-children]\n", argv[0]);
+    for (j = 0; j < argc; j++)
+        printf("argv[%d] = %s\n", j, argv[j]);
 
-    numChildren = (argc > 1) ?
-            getInt(argv[1], GN_GT_0, "num-children") : 1;
-
-    setbuf(stdout, NULL);    /* Tắt bộ đệm của stdout */
-
-    for (j = 0; j < numChildren; j++) {
-
-        switch (childPid = fork()) {
-
-        case -1:
-            errExit("fork");
-
-        case 0:
-            printf("%d child\n", j);
-            _exit(EXIT_SUCCESS);
-
-        default:
-            printf("%d parent\n", j);
-
-            wait(NULL);      /* Đợi process con kết thúc */
-
-            break;
-        }
-    }
+    for (ep = environ; *ep != NULL; ep++)
+        printf("environ: %s\n", *ep);
 
     exit(EXIT_SUCCESS);
 }
