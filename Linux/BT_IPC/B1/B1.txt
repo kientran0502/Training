@@ -1,0 +1,48 @@
+[ Khách hàng ] ──( 📢 PIPE: Gọi món )──> [ KHU VỰC 1: QUẦY TIẾP TÂN (Master Process) ]
+                                                        |
+                                          ( 🗖 SHARED MEMORY: Bàn Chuyển Giao ) 
+                                          ( 🔒 SEMAPHORE: Chuông Báo Hết/Có Chỗ )
+                                                        v
+                                         [ KHU VỰC 2: KHU BẾP SẢN XUẤT (Worker Process) ]
+                                            ├── Thread Tiếp Nhận: Nhặt đơn từ Bàn -> Cho vào Khay Nội Bộ
+                                            │                     ( 🔑 MUTEX: Khóa bảo vệ Khay Nội Bộ )
+                                            ├── Thread Đầu Bếp 1 & 2: Lấy đơn từ Khay -> Nướng & Đóng hộp
+                                            └── Thread Chuyển Hàng: Lấy Pizza chín -> Ném vào Băng Chuyền
+                                                                                          |
+                                                                           ( 📦 MESSAGE QUEUE: Băng Chuyền Log )
+                                                                                          v
+                                                                                   [ FILE: Nhật Ký Giao Hàng ]
+
+
+🏬 Mô tả Luồng Hoạt Động (Step-by-Step)
+Tầng 1: Nhận đơn hàng tại Quầy Tiếp Tân (Process 1: Master)
+Khách hàng gọi món: Khách hàng gõ tên món ăn (ví dụ: Pizza_Hải_Sản, Pizza_Bò_Phô_Mai) từ bàn phím.
+
+📢 Giao tiếp qua PIPE: Tên món ăn được truyền một chiều qua một Ống dẫn (PIPE) thẳng tới Quầy Tiếp Tân (Master Process).
+
+Đặc tính OS cần hiểu: Quầy tiếp tân sẽ đứng im đợi (Block), hễ có khách gõ phím gọi món thì mới tỉnh dậy làm việc.
+
+Tầng 2: Chuyển giao giữa Quầy và Bếp (Cầu nối IPC)
+🗖 Bàn Chuyển Giao (SHARED MEMORY): Giữa Quầy Tiếp Tân và Khu Bếp có một chiếc bàn gỗ lớn chia sẻ chung. Quầy Tiếp Tân đọc đơn hàng từ Pipe xong sẽ đặt tờ đơn lên chiếc bàn này.
+
+🔒 Chuông báo hiệu (SEMAPHORE): Chiếc bàn này rất nhỏ, chỉ vừa đúng 1 tờ đơn.
+
+Quầy Tiếp Tân không thể tự tiện đặt đơn nếu bàn đang có sẵn đơn (phải đợi chuông sem_empty).
+
+Khi đặt đơn xong, Quầy Tiếp Tân bấm chuông (sem_post(sem_full)) để báo cho Khu Bếp biết có đơn mới.
+
+Đặc tính OS cần hiểu: Hai khu vực này là 2 không gian hoàn toàn độc lập (2 Process). Chúng dùng chung một vùng nhớ vật lý nhưng không tự biết khi nào có dữ liệu mới, bắt buộc phải dùng Semaphore để "đá tín hiệu" cho nhau.
+
+Tầng 3: Xử lý bên trong Khu Bếp (Process 2: Worker)
+Khu bếp là một không gian khép kín chứa nhiều Nhân viên (Thread) cùng làm việc:
+
+Thread Tiếp Nhận: Chờ chuông Semaphore reo, chạy ra Bàn Chuyển Giao (Shared Memory) nhặt tờ đơn xuống, rồi nhanh chóng thả tờ đơn đó vào một Khay Đựng Đơn Nội Bộ (In-memory Queue) của bếp để giải phóng chiếc bàn bên ngoài.
+
+Thread Đầu Bếp (2 người làm song song): Hai đầu bếp liên tục lấy đơn từ Khay Đựng Đơn Nội Bộ ra để chế biến (Mã hóa chuỗi ký tự, ví dụ: đảo ngược chuỗi hoặc viết hoa toàn bộ).
+
+🔑 Khóa bảo vệ khay (MUTEX): Vì Khay Đựng Đơn Nội Bộ nằm chung trong bếp, cả Thread Tiếp Nhận và 2 Thread Đầu Bếp đều thò tay vào đây. Để tránh việc 2 đầu bếp tranh nhau giật lấy cùng 1 tờ đơn làm rách giấy (Race Condition), họ phải dùng một chiếc chìa khóa duy nhất (MUTEX) — ai giữ khóa mới được quyền thò tay vào khay lấy/cất đơn.
+
+Tầng 4: Xuất xưởng và Ghi Nhật Ký (Luồng kết thúc)
+📦 Băng Chuyền Đóng Gói (MESSAGE QUEUE): Sau khi Đầu Bếp nướng xong Pizza (xử lý xong dữ liệu), họ không tự tay đem đi ghi vào sổ nhật ký nhà hàng vì rất mất thời gian. Họ ném hộp Pizza lên một Băng chuyền tự động (Message Queue). Băng chuyền này tự động phân loại theo định dạng đóng gói sẵn ([Loại món] + [Thời gian] + [Trạng thái thành công]).
+
+Thread Chuyển Hàng (Ghi Log): Một nhân viên đứng ở cuối băng chuyền, chỉ làm đúng một việc: bốc từng hộp Pizza chạy qua và ghi thông tin vào File Nhật Ký (system.log).

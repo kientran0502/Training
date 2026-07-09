@@ -18,5 +18,6 @@ int main()
     mq_send(mesage_queue, "103", 4, 1);
     printf("Sent message: 103\n");
 
+    mq_close(mesage_queue);
     return 0;
 }
