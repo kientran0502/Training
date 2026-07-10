@@ -64,10 +64,7 @@ int main()
         switch(input[0])
         {
             case 'A':
-            mq_send(mesage_queue, "
-                
-                
-                ", 4, 1);
+            mq_send(mesage_queue, "", 4, 1);
             break;
 
             case 'B':

@@ -6,6 +6,9 @@
 //     printf("PIPE_BUF = %d\n", PIPE_BUF);
 //     return 0;
 // }
+
+
+
 #include <stdio.h>
 #include <sys/wait.h>
 #include <string.h>
@@ -96,3 +99,83 @@ int main(int argc, char *argv[])
             exit(EXIT_SUCCESS);
     }
 }
+
+
+
+
+
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <unistd.h>
+// #include <string.h>
+// #include <sys/wait.h>
+
+// #define MSG_SIZE 4094
+
+// int main()
+// {
+//     int fd[2];
+//     pipe(fd);
+
+//     if (fork() == 0)
+//     {
+//         close(fd[0]);
+
+//         char buf[MSG_SIZE];
+//         memset(buf, 'A', sizeof(buf));
+
+//         for (int i = 0; i < 100; i++)
+//             write(fd[1], buf, sizeof(buf));
+
+//         exit(0);
+//     }
+
+//     if (fork() == 0)
+//     {
+//         close(fd[0]);
+
+//         char buf[MSG_SIZE];
+//         memset(buf, 'B', sizeof(buf));
+
+//         for (int i = 0; i < 100; i++)
+//             write(fd[1], buf, sizeof(buf));
+
+//         exit(0);
+//     }
+
+//     close(fd[1]);
+
+//     // char buf[MSG_SIZE];
+
+//     // while (read(fd[0], buf, sizeof(buf)) > 0)
+//     // {
+//     //     printf("%.20s\n", buf);
+//     //     fflush(stdout);
+//     // }
+//     sleep(3);
+// char buf[4096];
+// ssize_t n;
+
+// while ((n = read(fd[0], buf, sizeof(buf))) > 0)
+// {
+//     char first = buf[0];
+
+//     int ok = 1;
+
+//     for (int i = 1; i < n; i++)
+//     {
+//         if (buf[i] != first)
+//         {
+//             ok = 0;
+//             printf("Mixed! at byte %d (%c -> %c)\n",
+//                    i, first, buf[i]);
+//             break;
+//         }
+//     }
+
+//     if (ok)
+//         printf("%c x %ld\n", first, n);
+// }
+//     wait(NULL);
+//     wait(NULL);
+// }
