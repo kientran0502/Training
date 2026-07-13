@@ -21,3 +21,4 @@ int main()
     mq_close(mesage_queue);
     return 0;
 }
+

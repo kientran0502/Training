@@ -46,28 +46,70 @@
 // }
 
 
-#include <stdlib.h>
+// #include <stdlib.h>
+// #include <stdio.h>
+
+// static void atexitFunc1(void)
+// {
+//     printf("atexit function 1 called\n");
+// }
+
+// static void atexitFunc2(void)
+// {
+//     printf("atexit function 2 called\n");
+// }
+
+// int main(int argc, char *argv[])
+// {
+//     if (atexit(atexitFunc1) != 0)
+//         printf("atexit 1 error");
+
+//     if (atexit(atexitFunc2) != 0)
+//         printf("atexit 2 error");
+
+//     printf ("Hello World\n");
+
+//     exit(EXIT_SUCCESS);
+// }
+
+
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-static void atexitFunc1(void)
+int main(void)
 {
-    printf("atexit function 1 called\n");
-}
+    pid_t pid = fork();
 
-static void atexitFunc2(void)
-{
-    printf("atexit function 2 called\n");
-}
+    if (pid < 0)
+    {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
 
-int main(int argc, char *argv[])
-{
-    if (atexit(atexitFunc1) != 0)
-        printf("atexit 1 error");
+    if (pid == 0)
+    {
+        // Child
+        printf("Child: PID = %d, PPID = %d\n",
+               getpid(), getppid());
 
-    if (atexit(atexitFunc2) != 0)
-        printf("atexit 2 error");
+        sleep(5);
 
-    printf ("Hello World\n");
+        printf("Child after parent exits:\n");
+        printf("PID = %d, PPID = %d\n",
+               getpid(), getppid());
 
-    exit(EXIT_SUCCESS);
+        exit(EXIT_SUCCESS);
+    }
+    else
+    {
+        // Parent
+        printf("Parent: PID = %d\n", getpid());
+
+        sleep(2);
+
+        printf("Parent exits.\n");
+
+        exit(EXIT_SUCCESS);
+    }
 }
